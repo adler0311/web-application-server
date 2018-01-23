@@ -3,8 +3,10 @@ package util;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
+import model.User;
 import org.junit.Test;
 
 import util.HttpRequestUtils.Pair;
@@ -76,5 +78,12 @@ public class HttpRequestUtilsTest {
         String line="GET /index.html HTTP/1.1";
         String path = HttpRequestUtils.parseURL(line);
         assertEquals(path, "/index.html");
+    }
+
+    @Test
+    public void parsePath() {
+        String url = "/user/create?userId=abcd&password=1234&name=name&email=email%40gmail.com";
+        String path=HttpRequestUtils.parsePath(url);
+        assertEquals(path,"/user/create");
     }
 }

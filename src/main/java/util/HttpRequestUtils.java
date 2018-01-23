@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+import model.User;
 
 public class HttpRequestUtils {
     /**
@@ -56,6 +57,29 @@ public class HttpRequestUtils {
     public static String parseURL(String line) {
         String[] token = line.split(" ");
         return token[1];
+    }
+
+    public static String parsePath(String url) {
+        int index=url.indexOf("?");
+        if (index==-1) {
+            return url;
+        }
+        return url.substring(0,index);
+    }
+
+    public static Map parseData(String url) {
+        int index =url.indexOf("?");
+        String params = url.substring(index+1);
+        return parseQueryString(params);
+    }
+
+    public static User storeToUserObject(Map data) {
+        String userId= (String) data.get("userId");
+        String password= (String) data.get("password");
+        String name= (String) data.get("name");
+        String email= (String) data.get("email");
+
+        return new User(userId,password,name,email);
     }
 
     public static class Pair {

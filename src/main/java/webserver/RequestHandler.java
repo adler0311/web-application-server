@@ -2,9 +2,11 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils;
@@ -27,7 +29,10 @@ public class RequestHandler extends Thread {
                      new BufferedReader(new InputStreamReader(connection.getInputStream(),"UTF-8"))) {
 
             String line = in.readLine();
-            String url = HttpRequestUtils.parseURL(line);
+            String url = URLDecoder.decode(HttpRequestUtils.parseURL(line),"UTF-8");
+            String path = HttpRequestUtils.parsePath(url);
+            User user = HttpRequestUtils.storeToUserObject(HttpRequestUtils.parseData(url));
+
             while (!"".equals(line)) {
                 if (line==null) return;
                 System.out.println(line);
@@ -36,9 +41,8 @@ public class RequestHandler extends Thread {
 
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
-            //byte[] body = "Hello World".getBytes();
-            //byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
-            byte[] body = Files.readAllBytes(Paths.get("./webapp" + url));
+
+            byte[] body = Files.readAllBytes(Paths.get("./webapp" + path));
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
@@ -49,7 +53,7 @@ public class RequestHandler extends Thread {
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
